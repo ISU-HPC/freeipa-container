@@ -16,6 +16,10 @@ RUN yum -y module install --setopt=install_weak_deps=False idm:DL1/adtrust idm:D
 # Container image which runs systemd
 # debug: RUN test -f /etc/machine-id && ! test -s /etc/machine-id
 # debug: RUN test "$container" = oci
+
+# Establish reasonably low open files limit in the container
+RUN echo "DefaultLimitNOFILE=1024" >> /etc/systemd/system.conf
+
 ENTRYPOINT [ "/usr/sbin/init" ]
 STOPSIGNAL RTMIN+3
 # test-addon: VOLUME [ "/var/log/journal" ]
@@ -36,7 +40,7 @@ RUN mkdir /var/log/journal
 RUN systemd-tmpfiles --remove --create
 # debug: RUN ! test -f /var/lib/systemd/random-seed
 # test-addon: VOLUME [ "/var/log/journal" ]
-# test: systemd-container-diff.sh list-dependencies-rhel-8.out docker-diff-minimal-rhel-8.exceptions docker-diff-minimal-rhel-8.out
+# test: systemd-container-diff.sh list-dependencies-rhel-8.out /dev/null docker-diff-minimal-rhel-8.out
 
 # Prepare for basic ipa-server-install in container
 # Address failing nis-domainname.service in the ipa-client-install step
@@ -46,8 +50,6 @@ ADD hostnamectl-wrapper /usr/bin/nisdomainname
 COPY patches/ipa-rhel-8.patch /root
 RUN set -o pipefail ; patch --verbose -p0 --fuzz=0 < /root/ipa-rhel-8.patch | tee /dev/stderr | sed -n 's/^patching file //;T;/\.py$/p' | xargs /usr/libexec/platform-python -m compileall
 
-# Workaround https://github.com/freeipa/freeipa-container/issues/187
-COPY certmonger-wait-for-ready.conf /usr/lib/systemd/system/certmonger.service.d/wait-for-ready.conf
 # test-addon: VOLUME [ "/var/log/journal" ]
 ## # test: systemd-container-ipa-server-install.sh
 
@@ -81,7 +83,7 @@ COPY ipa-server-configure-first.service ipa-server-upgrade.service ipa-server-up
 RUN ln -sv /usr/lib/systemd/system/ipa-server-configure-first.service /data-template/etc/systemd/system/container-ipa.target.wants/ipa-server-configure-first.service
 COPY exit-status.conf /usr/lib/systemd/system/systemd-poweroff.service.d/
 
-EXPOSE 53/udp 53 80 443 389 636 88 464 88/udp 464/udp 123/udp 7389 9443 9444 9445
+EXPOSE 53/udp 53 80 443 389 636 88 464 88/udp 464/udp 123/udp
 
 RUN uuidgen > /data-template/build-id
 

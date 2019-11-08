@@ -63,6 +63,13 @@ unattended invocation is possible, for example with
     docker run --rm -e PASSWORD=Secret123 -h ipa.example.test --read-only \
         freeipa-server exit-on-finished -U -r EXAMPLE.TEST --no-ntp
 
+To allow for unprivileged container operation, use the `docker run -h ...`
+option to set the hostname for the FreeIPA server in the container.
+If it's not possible to set the hostname for the container, specify it
+with `IPA_SERVER_HOSTNAME` environment variable, for example with
+`docker run -e IPA_SERVER_HOSTNAME=...`.
+Do not use the `ipa-server-install --hostname ...` option.
+
 Optionally, you can put into the directory mounted into /data
 (/var/lib/ipa-data in this example) a file
 
@@ -131,8 +138,11 @@ address. Starting the server would then be
 
     docker run -e IPA_SERVER_IP=10.12.0.98 -p 53:53/udp -p 53:53 \
         -p 80:80 -p 443:443 -p 389:389 -p 636:636 -p 88:88 -p 464:464 \
-	-p 88:88/udp -p 464:464/udp -p 123:123/udp -p 7389:7389 \
-	-p 9443:9443 -p 9444:9444 -p 9445:9445 ...
+	-p 88:88/udp -p 464:464/udp -p 123:123/udp ...
+
+Note that an attempt of achieving this goal with the `--ip-address`
+option of `ipa-server-install` command is likely to fail, and should
+be avoided.
 
 If you have existing container with data volume, it should be safe
 to shut it down and run new one based on newer image, with the same

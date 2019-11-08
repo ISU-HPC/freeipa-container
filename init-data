@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2015--2016 Jan Pazdziora
+# Copyright 2015--2019 Jan Pazdziora
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,13 +30,17 @@ case "$1" in
 	;;
 esac
 
-for i in /run/* /tmp/* ; do
+for i in /run/* /tmp/var/tmp/* /tmp/* ; do
 	if [ "$i" == '/run/secrets' ] ; then
 		:
 	elif [ -L "$i" -o -f "$i" ] ; then
 		rm -f "$i"
 	else
-		rm -rf "$i/*"
+		for j in "$i"/* ; do
+			if [ "$j" != '/tmp/var/tmp' ] ; then
+				rm -rf "$j"
+			fi
+		done
 	fi
 done
 
@@ -100,8 +104,8 @@ if [ -z "$COMMAND" ] ; then
 	fi
 fi
 
-if [ -n "$IPA_SERVER_INSTALL_OPTS" -a "$COMMAND" != 'ipa-server-install' ] ; then
-	echo "Invocation error: IPA_SERVER_INSTALL_OPTS should only be used with ipa-server-install." >&2
+if [ -n "$IPA_SERVER_INSTALL_OPTS" -a "$COMMAND" != 'ipa-server-install' -a "$COMMAND" != 'ipa-replica-install' ] ; then
+	echo "Invocation error: IPA_SERVER_INSTALL_OPTS should only be used with ipa-server-install or ipa-replica-install." >&2
 	exit 7
 fi
 

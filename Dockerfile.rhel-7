@@ -5,7 +5,6 @@ MAINTAINER FreeIPA Developers <freeipa-devel@lists.fedorahosted.org>
 # Moving groupadd before freeipa installation to ensure uid and guid will be same
 RUN groupadd -g 288 kdcproxy ; useradd -u 288 -g 288 -c 'IPA KDC Proxy User' -d '/var/lib/kdcproxy' -s '/sbin/nologin' kdcproxy
 RUN groupadd -g 289 ipaapi; useradd -u 289 -g 289 -c 'IPA Framework User' -r -d / -s '/sbin/nologin' ipaapi
-RUN groupadd -g 389 dirsrv ; useradd -u 389 -g 389 -c 'user for 389-ds-base' -r -d '/usr/share/dirsrv' -s '/sbin/nologin' dirsrv
 
 # Workaround 1615948
 RUN ln -s /bin/false /usr/sbin/systemd-machine-id-setup
@@ -15,11 +14,12 @@ RUN yum install --disablerepo='*' --enablerepo=rhel-7-server-rpms -y ipa-server 
 
 # Container image which runs systemd
 # debug: RUN test "$container" = oci
+
+# Establish reasonably low open files limit in the container
+RUN echo "DefaultLimitNOFILE=1024" >> /etc/systemd/system.conf
+
 ENTRYPOINT [ "/usr/sbin/init" ]
 STOPSIGNAL RTMIN+3
-# Workaround 1373833
-COPY patches/basic-centos-7.patch /root
-RUN patch --verbose -p0 --fuzz=0 < /root/basic-centos-7.patch
 # test-addon: VOLUME [ "/var/log/journal" ]
 # test: systemd-container-failed.sh network.service TRAVIS:sys-fs-fuse-connections.mount var-lib-nfs-rpc_pipefs.mount
 
@@ -77,7 +77,7 @@ COPY ipa-server-configure-first.service ipa-server-upgrade.service ipa-server-up
 RUN ln -sv /usr/lib/systemd/system/ipa-server-configure-first.service /data-template/etc/systemd/system/container-ipa.target.wants/ipa-server-configure-first.service
 COPY exit-via-chroot.conf /usr/lib/systemd/system/systemd-poweroff.service.d/
 
-EXPOSE 53/udp 53 80 443 389 636 88 464 88/udp 464/udp 123/udp 7389 9443 9444 9445
+EXPOSE 53/udp 53 80 443 389 636 88 464 88/udp 464/udp 123/udp
 
 RUN uuidgen > /data-template/build-id
 
