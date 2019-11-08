@@ -1,0 +1,20 @@
+# insert at top of Dockerfile.centos-7
+
+RUN yum -y install epel-release
+
+RUN groupadd -g 400 -r munge
+RUN useradd munge -r -s /sbin/nologin -u 400 -g 400 -d /var/run/munge
+
+RUN groupadd -g 401 slurm
+RUN useradd slurm -u 401 -g 401 -s /sbin/nologin
+
+RUN yum -y install slurm-slurmd python2-pip cronie crontabs cronie-anacron openssh-server  python-urllib3
+RUN pip install boto3
+
+
+# insert at bottom
+#
+
+CMD ip route add 10.1.8.0/22 via 192.168.1.1 && /usr/sbin/crond  && /usr/sbin/sshd -D
+
+
