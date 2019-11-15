@@ -128,4 +128,4 @@ solution provides features for further integration with Linux based clients \
 (SUDO, automount) and integration with Active Directory based infrastructures \
 (Trusts)."
 
-CMD ip route add 10.1.8.0/22 via 192.168.1.1 && /usr/sbin/crond  && /usr/sbin/sshd -D
+#CMD ip route add 10.1.8.0/22 via 192.168.1.1 && /usr/sbin/crond  && /usr/sbin/sshd -D

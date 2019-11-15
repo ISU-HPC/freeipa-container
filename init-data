@@ -266,6 +266,16 @@ if [ -n "$IPA_SERVER_IP" ] ; then
 	echo "$IPA_SERVER_IP" > /run/ipa/ipa-server-ip
 fi
 
+
+
+#ip route add 10.1.8.0/22 via 192.168.1.1  
+/usr/sbin/crond   
+if [ -f /etc/ssh/ssh_host_rsa_key ] ; then
+   /usr/sbin/sshd
+fi
+
 exec /usr/sbin/init --show-status=false $SYSTEMD_OPTS
+q
+q
 
 exit 10
