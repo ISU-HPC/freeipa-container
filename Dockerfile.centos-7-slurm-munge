@@ -14,6 +14,11 @@ RUN useradd slurm -u 401 -g 401 -s /sbin/nologin
 RUN yum -y install slurm-slurmd python2-pip cronie crontabs cronie-anacron openssh-server  python-urllib3
 RUN pip install boto3
 
+RUN touch /etc/ssh/ssh_host_ed25519_key
+RUN touch /etc/ssh/ssh_host_ed25519_key.pub
+RUN chmod 600 /etc/ssh/ssh_host_ed25519_key /etc/ssh/ssh_host_ed25519_key.pub
+RUN mkdir /etc/slurm
+RUN touch /etc/slurm/slurm.conf
 
 
 # Moving groupadd before freeipa installation to ensure uid and guid will be same
