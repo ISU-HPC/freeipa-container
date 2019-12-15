@@ -19,6 +19,12 @@ RUN touch /etc/ssh/ssh_host_ed25519_key.pub
 RUN chmod 600 /etc/ssh/ssh_host_ed25519_key /etc/ssh/ssh_host_ed25519_key.pub
 RUN mkdir /etc/slurm
 RUN touch /etc/slurm/slurm.conf
+RUN mkdir /etc/munge
+RUN chmod 700 /etc/munge
+RUN touch /etc/munge/munge.key
+RUN chmod 400  /etc/munge/munge.key
+RUN chown -R munge.munge /etc/munge
+
 
 RUN systemctl enable sshd
 

@@ -15,6 +15,10 @@
 # limitations under the License.
 
 # using as client dont setup server
+
+/sbin/sshd
+/sbin/munged
+/sbin/slurmd
 exit
 
 mark_exit_code () {
