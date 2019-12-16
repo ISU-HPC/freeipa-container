@@ -10,12 +10,8 @@ RUN rpmbuild -ta slurm*.tar.bz2
 
 
 
-
 FROM registry.centos.org/centos:7
-
 MAINTAINER David Orman
-
-
 
 RUN groupadd -g 400 -r munge
 RUN useradd munge -r -s /sbin/nologin -u 400 -g 400 -d /var/run/munge
@@ -37,6 +33,9 @@ RUN touch /etc/slurm/slurm.conf
 RUN touch /etc/munge/munge.key
 RUN chmod 400  /etc/munge/munge.key
 RUN chown -R munge.munge /etc/munge
+RUN mkdir /GA
+RUN mkdir /KEEP
+
 
 
 RUN systemctl enable sshd
