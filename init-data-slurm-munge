@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# Copyright 2015--2019 Jan Pazdziora
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Initialization of /data (bind-mounted volume) from /data-template
+# we IPA server was not yet configured.
+
+set -e
+
+# Turn on tracing of this script
+test -z "$DEBUG_TRACE" || set -x
+
+cd /
+
+case "$1" in
+	/bin/bash|bash)
+		exec "$@"
+	;;
+esac
+
+for i in /run/* /tmp/var/tmp/* /tmp/* ; do
+	if [ "$i" == '/run/secrets' ] ; then
+		:
+	elif [ -L "$i" -o -f "$i" ] ; then
+		rm -f "$i"
+	else
+		for j in "$i"/* ; do
+			if [ "$j" != '/tmp/var/tmp' ] ; then
+				rm -rf "$j"
+			fi
+		done
+	fi
+done
+
+/usr/local/bin/populate-volume-from-template /tmp
+
+# Workaround 1373562
+mkdir -p /run/lock
+
+mkdir -p /run/ipa /run/log /data/var/log/journal
+ln -s /data/var/log/journal /run/log/journal
+
+if [ "$1" == 'no-exit' -o -n "$DEBUG_NO_EXIT" ] ; then
+	if [ "$1" == 'no-exit' ] ; then
+		shift
+	fi
+	# Debugging:  Don't power off if IPA install/upgrade fails
+	# Create service drop-in to override `FailureAction`
+	for i in ipa-server-configure-first.service ipa-server-upgrade.service; do
+		mkdir -p /run/systemd/system/$i.d
+		echo -e "[Service]\nFailureAction=none" > /run/systemd/system/$i.d/50-no-poweroff.conf
+	done
+elif [ "$1" == 'exit-on-finished' ] ; then
+	for i in ipa-server-configure-first.service ipa-server-upgrade.service; do
+		mkdir -p /run/systemd/system/$i.d
+		# We'd like to use SuccessAction=poweroff here but it's only
+		# available in systemd 236.
+		echo -e "[Service]\nExecStartPost=/usr/bin/systemctl poweroff" > /run/systemd/system/$i.d/50-success-poweroff.conf
+	done
+	shift
+fi
+
+# Debugging:  Turn on tracing of ipa-server-configure-first script
+test -z "$DEBUG_TRACE" || touch /run/ipa/debug-trace
+
+
+#ip route add 10.1.8.0/22 via 192.168.1.1  
+#/usr/sbin/crond   
+#if [ -f /etc/ssh/ssh_host_rsa_key ] ; then
+#   /usr/sbin/sshd
+#fi
+
+exec /usr/sbin/init --show-status=false $SYSTEMD_OPTS
+
+exit 10
