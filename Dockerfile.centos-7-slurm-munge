@@ -32,13 +32,14 @@ RUN chmod 600 /etc/ssh/ssh_host_ed25519_key /etc/ssh/ssh_host_ed25519_key.pub
 RUN touch /etc/slurm/slurm.conf
 RUN touch /etc/munge/munge.key
 RUN chmod 400  /etc/munge/munge.key
-RUN chown -R munge.munge /etc/munge
+RUN chown -R 400.400 /etc/munge
 RUN mkdir /GA
 RUN mkdir /KEEP
 
 
 
 RUN systemctl enable sshd
+RUN systemctl enable munge
 
 # Moving groupadd before freeipa installation to ensure uid and guid will be same
 RUN groupadd -g 288 kdcproxy ; useradd -u 288 -g 288 -c 'IPA KDC Proxy User' -d '/var/lib/kdcproxy' -s '/sbin/nologin' kdcproxy
