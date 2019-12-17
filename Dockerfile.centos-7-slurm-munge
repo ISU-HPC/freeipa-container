@@ -65,18 +65,18 @@ STOPSIGNAL RTMIN+3
 # test: systemd-container-failed.sh network.service TRAVIS:sys-fs-fuse-connections.mount var-lib-nfs-rpc_pipefs.mount
 
 # Minimize the systemd setup
-RUN find /etc/systemd/system /usr/lib/systemd/system/{basic,multi-user,sysinit}.target.wants -type l | xargs rm -v
-COPY patches/minimal-centos-7.patch /root/
-RUN patch --verbose -p0 --fuzz=0 < /root/minimal-centos-7.patch
+##RUN find /etc/systemd/system /usr/lib/systemd/system/{basic,multi-user,sysinit}.target.wants -type l | xargs rm -v
+##COPY patches/minimal-centos-7.patch /root/
+##RUN patch --verbose -p0 --fuzz=0 < /root/minimal-centos-7.patch
 # debug: RUN ! find /etc/systemd/system /usr/lib/systemd/system/{basic,multi-user,sysinit}.target.wants /etc/tmpfiles.d -type f | grep .
 
-COPY container-ipa.target /usr/lib/systemd/system/
-RUN systemctl set-default container-ipa.target
-RUN rmdir -v /etc/systemd/system/multi-user.target.wants \
-	&& mkdir /etc/systemd/system/container-ipa.target.wants \
-	&& ln -s /etc/systemd/system/container-ipa.target.wants /etc/systemd/system/multi-user.target.wants
-RUN rm /var/lib/systemd/random-seed
-RUN echo 0123456789abcdef0000000000000000 > /etc/machine-id && systemd-tmpfiles --remove --create && echo -n > /etc/machine-id
+##COPY container-ipa.target /usr/lib/systemd/system/
+##RUN systemctl set-default container-ipa.target
+##RUN rmdir -v /etc/systemd/system/multi-user.target.wants \
+##	&& mkdir /etc/systemd/system/container-ipa.target.wants \
+##	&& ln -s /etc/systemd/system/container-ipa.target.wants /etc/systemd/system/multi-user.target.wants
+##RUN rm /var/lib/systemd/random-seed
+##RUN echo 0123456789abcdef0000000000000000 > /etc/machine-id && systemd-tmpfiles --remove --create && echo -n > /etc/machine-id
 # debug: RUN ! test -f /var/lib/systemd/random-seed
 # test-addon: VOLUME [ "/var/log/journal" ]
 # test: systemd-container-diff.sh list-dependencies-centos-7.out docker-diff-minimal-centos-7.exceptions docker-diff-minimal-centos-7.out
@@ -113,9 +113,9 @@ ENTRYPOINT [ "/usr/local/sbin/init" ]
 
 # Configure master/replica upon the first invocation
 COPY init-data-slurm-munge /usr/local/sbin/init
-COPY ipa-server-configure-first exit-with-status ipa-volume-upgrade-* /usr/sbin/
-COPY ipa-server-configure-first.service ipa-server-upgrade.service ipa-server-update-self-ip-address.service /usr/lib/systemd/system/
-RUN ln -sv /usr/lib/systemd/system/ipa-server-configure-first.service /data-template/etc/systemd/system/container-ipa.target.wants/ipa-server-configure-first.service
+##COPY ipa-server-configure-first exit-with-status ipa-volume-upgrade-* /usr/sbin/
+##COPY ipa-server-configure-first.service ipa-server-upgrade.service ipa-server-update-self-ip-address.service /usr/lib/systemd/system/
+##RUN ln -sv /usr/lib/systemd/system/ipa-server-configure-first.service /data-template/etc/systemd/system/container-ipa.target.wants/ipa-server-configure-first.service
 COPY exit-via-chroot.conf /usr/lib/systemd/system/systemd-poweroff.service.d/
 
 EXPOSE 53/udp 53 80 443 389 636 88 464 88/udp 464/udp 123/udp

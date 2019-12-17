@@ -16,8 +16,7 @@
 
 # using as client dont setup server
 
-/sbin/sshd
-/sbin/munged -f
+
 exit
 
 mark_exit_code () {

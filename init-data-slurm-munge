@@ -77,13 +77,12 @@ test -z "$DEBUG_TRACE" || touch /run/ipa/debug-trace
 
 
 #ip route add 10.1.8.0/22 via 192.168.1.1  
-#/usr/sbin/crond   
-#if [ -f /etc/ssh/ssh_host_rsa_key ] ; then
-#   /usr/sbin/sshd
-#fi
 
 /sbin/sshd
-mkdir -p -m 777 /var/log/munge
+mkdir -p -m 755 /var/run/munge
+mkdir -p -m 700 /var/log/munge
+chown munge.munge /var/run/munge
+chown munge.munge /var/log/munge
 /sbin/munged -f
 /sbin/crond  
 
