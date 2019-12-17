@@ -275,7 +275,5 @@ if [ -f /etc/ssh/ssh_host_rsa_key ] ; then
 fi
 
 exec /usr/sbin/init --show-status=false $SYSTEMD_OPTS
-q
-q
 
 exit 10
