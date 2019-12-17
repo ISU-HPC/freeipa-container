@@ -83,7 +83,7 @@ test -z "$DEBUG_TRACE" || touch /run/ipa/debug-trace
 #fi
 
 /sbin/sshd
-/sbin/munged -f
+#/sbin/munged -f
 /sbin/crond  
 
 exec /usr/sbin/init --show-status=false $SYSTEMD_OPTS
