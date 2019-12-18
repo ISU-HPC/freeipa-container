@@ -20,7 +20,7 @@ RUN groupadd -g 401 slurm
 RUN useradd slurm -u 401 -g 401 -s /sbin/nologin
 
 RUN yum -y install epel-release 
-RUN yum -y install slurm-slurmd python2-pip cronie crontabs cronie-anacron openssh-server  python-urllib3 munge sudo wget google-authenticator postfix krb5-workstation
+RUN yum -y install slurm-slurmd python2-pip cronie crontabs cronie-anacron openssh-server  python-urllib3 munge sudo wget google-authenticator postfix krb5-workstation mailx
 RUN pip install boto3
 
 COPY --from=builder  /root/rpmbuild/RPMS/x86_64/slurm* /root/
@@ -36,7 +36,7 @@ RUN chown -R 400.400 /etc/munge
 RUN mkdir /GA
 RUN mkdir /KEEP
 
-
+RUN mkfifo /var/spool/postfix/public/pickup
 
 RUN systemctl enable sshd
 RUN systemctl enable munge
