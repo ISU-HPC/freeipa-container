@@ -85,6 +85,7 @@ chown munge.munge /var/run/munge
 chown munge.munge /var/log/munge
 /sbin/munged -f
 /sbin/crond  
+/usr/libexec/postfix/master -w
 
 exec /usr/sbin/init --show-status=false $SYSTEMD_OPTS
 
