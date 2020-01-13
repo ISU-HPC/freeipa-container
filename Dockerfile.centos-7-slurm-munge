@@ -125,6 +125,7 @@ EXPOSE 53/udp 53 80 443 389 636 88 464 88/udp 464/udp 123/udp
 RUN uuidgen > /data-template/build-id
 
 # Invocation:
+# Need to remember this is here
 # docker run -ti -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /tmp -v /opt/ipa-data:/data:Z -h ipa.example.test ${NAME} [ options ]
 
 # Atomic specific bits
