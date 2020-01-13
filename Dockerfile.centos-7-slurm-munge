@@ -22,6 +22,7 @@ RUN useradd slurm -u 401 -g 401 -s /sbin/nologin
 RUN yum -y install epel-release 
 RUN yum -y install slurm-slurmd python2-pip cronie crontabs cronie-anacron openssh-server  python-urllib3 munge sudo wget google-authenticator postfix krb5-workstation mailx
 RUN pip install boto3
+RUN ls -l /etc/pam.d/sudo
 
 COPY --from=builder  /root/rpmbuild/RPMS/x86_64/slurm* /root/
 RUN yum -y localinstall /root/slurm*
@@ -50,6 +51,7 @@ RUN groupadd -g 289 ipaapi; useradd -u 289 -g 289 -c 'IPA Framework User' -r -d 
 RUN ln -s /bin/false /usr/sbin/systemd-machine-id-setup
 RUN yum upgrade -y && yum install -y ipa-server ipa-server-dns ipa-server-trust-ad patch && yum clean all
 
+RUN ls -l /etc/pam.d/sudo
 # debug: RUN test $( getent passwd | grep -E "^(dirsrv:x:389|ipaapi:x:289|kdcproxy:x:288|pkiuser:x:17):" | wc -l ) -eq 4
 
 # Container image which runs systemd
@@ -91,7 +93,6 @@ COPY patches/ipa-rhel-7.patch /root
 RUN set -o pipefail ; patch --verbose -p0 --fuzz=0 < /root/ipa-rhel-7.patch | tee /dev/stderr | sed -n 's/^patching file //;T;/\.py$/p' | xargs python -m compileall
 # test-addon: VOLUME [ "/var/log/journal" ]
 ## # test: systemd-container-ipa-server-install.sh
-
 # Move configuration and data to data volume
 COPY patches/ipa-data-centos-7.patch /root
 RUN set -o pipefail ; patch --verbose -p0 --fuzz=0 < /root/ipa-data-centos-7.patch | tee /dev/stderr | sed -n 's/^patching file //;T;/\.py$/p' | xargs python -m compileall

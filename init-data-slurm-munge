@@ -78,14 +78,16 @@ test -z "$DEBUG_TRACE" || touch /run/ipa/debug-trace
 
 #ip route add 10.1.8.0/22 via 192.168.1.1  
 
-/sbin/sshd
-mkdir -p -m 755 /var/run/munge
-mkdir -p -m 700 /var/log/munge
-chown munge.munge /var/run/munge
-chown munge.munge /var/log/munge
-/sbin/munged -f
-/sbin/crond  
-/usr/libexec/postfix/master -w
+if [ -f /opt/setup-finished ];  then
+  mkdir -p -m 755 /var/run/munge
+  mkdir -p -m 700 /var/log/munge
+  chown munge.munge /var/run/munge
+  chown munge.munge /var/log/munge
+  /sbin/sshd
+  /sbin/munged -f
+  /sbin/crond  
+  /usr/libexec/postfix/master -w
+fi
 
 exec /usr/sbin/init --show-status=false $SYSTEMD_OPTS
 
