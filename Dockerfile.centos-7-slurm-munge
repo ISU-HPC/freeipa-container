@@ -105,7 +105,7 @@ COPY volume-data-list volume-tmp-list volume-data-autoupdate /etc/
 RUN /usr/local/bin/prepare-volume-template /etc/volume-data-list /data
 RUN /usr/local/bin/prepare-volume-template /etc/volume-tmp-list /tmp
 RUN /usr/local/bin/extract-rpm-upgrade-scriptlets
-
+RUN echo Hi
 RUN echo 2.0 > /etc/volume-version
 VOLUME [ "/tmp", "/run", "/data", "/var/log/journal" ]
 
