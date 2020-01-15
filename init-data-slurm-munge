@@ -78,11 +78,7 @@ test -z "$DEBUG_TRACE" || touch /run/ipa/debug-trace
 
 #ip route add 10.1.8.0/22 via 192.168.1.1  
 
-if [ ! -f /opt/setup-finished ];  then
-else 
-  /usr/local/bin/populate-volume-from-template /tmp /data
-  touch /opt/setup-finished
-fi
+/usr/local/bin/startup.sh
 
 mkdir -p -m 755 /var/run/munge
 mkdir -p -m 700 /var/log/munge
