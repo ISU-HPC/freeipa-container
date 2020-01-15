@@ -22,7 +22,6 @@ RUN useradd slurm -u 401 -g 401 -s /sbin/nologin
 RUN yum -y install epel-release 
 RUN yum -y install slurm-slurmd python2-pip cronie crontabs cronie-anacron openssh-server  python-urllib3 munge sudo wget google-authenticator postfix krb5-workstation mailx
 RUN pip install boto3
-RUN ls -l /etc/pam.d/sudo
 
 COPY --from=builder  /root/rpmbuild/RPMS/x86_64/slurm* /root/
 RUN yum -y localinstall /root/slurm*
@@ -33,6 +32,8 @@ RUN chmod 400  /etc/munge/munge.key
 RUN chown -R 400.400 /etc/munge
 RUN mkdir /GA
 RUN mkdir /KEEP
+RUN ssh-keygen -q -t ecdsa -f /tmp/ssh_host_ecdsa_key -N ''
+RUN ssh-keygen -q -t rsa   -f /tmp/ssh_host_rsa_key   -N ''
 
 RUN mkfifo /var/spool/postfix/public/pickup
 
@@ -48,7 +49,6 @@ RUN groupadd -g 289 ipaapi; useradd -u 289 -g 289 -c 'IPA Framework User' -r -d 
 RUN ln -s /bin/false /usr/sbin/systemd-machine-id-setup
 RUN yum upgrade -y && yum install -y ipa-server ipa-server-dns ipa-server-trust-ad patch && yum clean all
 
-RUN ls -l /etc/pam.d/sudo
 # debug: RUN test $( getent passwd | grep -E "^(dirsrv:x:389|ipaapi:x:289|kdcproxy:x:288|pkiuser:x:17):" | wc -l ) -eq 4
 
 # Container image which runs systemd
@@ -102,7 +102,6 @@ COPY volume-data-list volume-tmp-list volume-data-autoupdate /etc/
 RUN /usr/local/bin/prepare-volume-template /etc/volume-data-list /data
 RUN /usr/local/bin/prepare-volume-template /etc/volume-tmp-list /tmp
 RUN /usr/local/bin/extract-rpm-upgrade-scriptlets
-RUN echo Hi
 RUN echo 2.0 > /etc/volume-version
 VOLUME [ "/tmp", "/run", "/data", "/var/log/journal" ]
 
@@ -153,5 +152,3 @@ solution provides features for further integration with Linux based clients \
 (SUDO, automount) and integration with Active Directory based infrastructures \
 (Trusts)."
 
-#CMD ip route add 10.1.8.0/22 via 192.168.1.1  && /usr/sbin/sshd -D
-#CMD /usr/sbin/sshd -D
