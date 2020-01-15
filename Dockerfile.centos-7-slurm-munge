@@ -27,9 +27,6 @@ RUN ls -l /etc/pam.d/sudo
 COPY --from=builder  /root/rpmbuild/RPMS/x86_64/slurm* /root/
 RUN yum -y localinstall /root/slurm*
 
-#RUN touch /etc/ssh/ssh_host_ed25519_key
-#RUN touch /etc/ssh/ssh_host_ed25519_key.pub
-#RUN chmod 600 /etc/ssh/ssh_host_ed25519_key /etc/ssh/ssh_host_ed25519_key.pub
 RUN touch /etc/slurm/slurm.conf
 RUN touch /etc/munge/munge.key
 RUN chmod 400  /etc/munge/munge.key
@@ -39,9 +36,9 @@ RUN mkdir /KEEP
 
 RUN mkfifo /var/spool/postfix/public/pickup
 
-RUN systemctl enable sshd
-RUN systemctl enable munge
-RUN systemctl enable postfix
+#RUN systemctl enable sshd
+#RUN systemctl enable munge
+#RUN systemctl enable postfix
 
 # Moving groupadd before freeipa installation to ensure uid and guid will be same
 RUN groupadd -g 288 kdcproxy ; useradd -u 288 -g 288 -c 'IPA KDC Proxy User' -d '/var/lib/kdcproxy' -s '/sbin/nologin' kdcproxy
