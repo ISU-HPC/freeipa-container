@@ -15,8 +15,8 @@ MAINTAINER David Orman
 
 # geneious prereq additions
 RUN yum -q -y remove java-1.5.0-gcj-devel java-1.7.0 java-1.6.0
-RUN yum -y groupinstall Base Desktop "General Purpose Desktop" "Graphical Administration Tools" "X Window System" 
-#RUN yum -y install policycoreutils-gui tmpwatch net-tools bind-utils yum-utils perl-Test-Exception  java-1.8.0 postgresql postgresql-server lsb
+#RUN yum -y groupinstall Base Desktop "General Purpose Desktop" "Graphical Administration Tools" "X Window System" 
+RUN yum -y install policycoreutils-gui tmpwatch net-tools bind-utils yum-utils perl-Test-Exception  java-1.8.0 postgresql postgresql-server lsb
 # end geneious prereq
 
 RUN groupadd -g 400 -r munge
