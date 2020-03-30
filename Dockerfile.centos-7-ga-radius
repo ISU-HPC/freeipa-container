@@ -6,7 +6,8 @@ MAINTAINER Jan Pazdziora
 RUN curl -k https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm -o /root/epel-release-latest-7.noarch.rpm
 RUN yum localinstall -y /root/epel-release-latest-7.noarch.rpm
 RUN sed -i "s/metalink=https/metalink=http/" /etc/yum.repos.d/epel.repo
-RUN yum install -y google-authenticator freeradius freeradius-utils
+#RUN yum install -y google-authenticator freeradius freeradius-utils
+RUN yum install -y cronie crontabs cronie-anacron openssh-clients nfs-utils iproute freeradius freeradius-utils google-authenticator
 
 # Moving groupadd before freeipa installation to ensure uid and guid will be same
 RUN groupadd -g 288 kdcproxy ; useradd -u 288 -g 288 -c 'IPA KDC Proxy User' -d '/var/lib/kdcproxy' -s '/sbin/nologin' kdcproxy
