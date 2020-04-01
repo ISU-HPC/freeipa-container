@@ -98,6 +98,7 @@ RUN uuidgen > /data-template/build-id
 COPY install.sh uninstall.sh /bin/
 COPY atomic-install-help /usr/share/ipa/
 
+RUN yum clean all
 # For atomic, we run INSTALL --privileged but install.sh will start another unprivileged container.
 # We do it this way to be able to set hostname for the unprivileged container.
 LABEL install 'docker run -ti --rm --privileged -v /:/host -e HOST=/host -e DATADIR=/var/lib/${NAME} -e NAME=${NAME} -e IMAGE=${IMAGE} ${IMAGE} /bin/install.sh'
