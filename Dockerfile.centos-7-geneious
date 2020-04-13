@@ -27,12 +27,6 @@ rm -f /lib/systemd/system/basic.target.wants/*;\
 rm -f /lib/systemd/system/anaconda.target.wants/*;
 #
 
-# geneious prereq additions
-RUN yum -q -y remove java-1.5.0-gcj-devel java-1.7.0 java-1.6.0
-RUN yum -y install policycoreutils-gui tmpwatch net-tools bind-utils yum-utils perl-Test-Exception  java-1.8.0 postgresql postgresql-server lsb
-RUN systemctl enable postgresql.service
-# # end geneious prereq
-
 # slurm-munge additions
 RUN groupadd -g 400 -r munge
 RUN useradd munge -r -s /sbin/nologin -u 400 -g 400 -d /var/run/munge
@@ -65,6 +59,15 @@ RUN systemctl enable postfix
 # Moving groupadd before freeipa installation to ensure uid and guid will be same
 RUN groupadd -g 288 kdcproxy ; useradd -u 288 -g 288 -c 'IPA KDC Proxy User' -d '/var/lib/kdcproxy' -s '/sbin/nologin' kdcproxy
 RUN groupadd -g 289 ipaapi; useradd -u 289 -g 289 -c 'IPA Framework User' -r -d / -s '/sbin/nologin' ipaapi
+
+# geneious prereq additions
+RUN yum -y install redhat-lsb redhat-lsb.i686 redhat-lsb-graphics redhat-lsb-printing perl-Test-Exception policycoreutils-gui tmpwatch net-tools bind-utils yum-utils java-1.8.0  postgresql postgresql-server
+RUN yum -y groupinstall Base Desktop "General Purpose Desktop" "Graphical Administration Tools" "X Window System"
+
+RUN yum -q -y remove java-1.5.0-gcj-devel java-1.7.0 java-1.6.0
+#RUN yum -y install policycoreutils-gui tmpwatch net-tools bind-utils yum-utils perl-Test-Exception  java-1.8.0 postgresql postgresql-server lsb
+RUN systemctl enable postgresql.service
+# # end geneious prereq
 
 # Workaround 1615948
 RUN ln -s /bin/false /usr/sbin/systemd-machine-id-setup
