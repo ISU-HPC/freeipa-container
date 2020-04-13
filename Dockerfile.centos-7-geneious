@@ -13,12 +13,27 @@ RUN rpmbuild -ta slurm*.tar.bz2
 FROM registry.centos.org/centos:7
 MAINTAINER David Orman
 
+#
+## systemd stuff from: https://hub.docker.com/_/centos
+##
+RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
+systemd-tmpfiles-setup.service ] || rm -f $i; done); \
+rm -f /lib/systemd/system/multi-user.target.wants/*;\
+rm -f /etc/systemd/system/*.wants/*;\
+rm -f /lib/systemd/system/local-fs.target.wants/*; \
+rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
+rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
+rm -f /lib/systemd/system/basic.target.wants/*;\
+rm -f /lib/systemd/system/anaconda.target.wants/*;
+#
+
 # geneious prereq additions
 RUN yum -q -y remove java-1.5.0-gcj-devel java-1.7.0 java-1.6.0
 RUN yum -y install policycoreutils-gui tmpwatch net-tools bind-utils yum-utils perl-Test-Exception  java-1.8.0 postgresql postgresql-server lsb
 RUN systemctl enable postgresql.service
 # # end geneious prereq
 
+# slurm-munge additions
 RUN groupadd -g 400 -r munge
 RUN useradd munge -r -s /sbin/nologin -u 400 -g 400 -d /var/run/munge
 RUN groupadd -g 401 slurm
@@ -35,16 +50,17 @@ RUN touch /etc/slurm/slurm.conf
 RUN touch /etc/munge/munge.key
 RUN chmod 400  /etc/munge/munge.key
 RUN chown -R 400.400 /etc/munge
-RUN mkdir /GA
-RUN mkdir /KEEP
+#RUN mkdir /GA
+#RUN mkdir /KEEP
+# slurm-munge additions
 RUN ssh-keygen -q -t ecdsa -f /tmp/ssh_host_ecdsa_key -N ''
 RUN ssh-keygen -q -t rsa   -f /tmp/ssh_host_rsa_key   -N ''
 
 RUN mkfifo /var/spool/postfix/public/pickup
 
-#RUN systemctl enable sshd
-#RUN systemctl enable munge
-#RUN systemctl enable postfix
+RUN systemctl enable sshd
+RUN systemctl enable munge
+RUN systemctl enable postfix
 
 # Moving groupadd before freeipa installation to ensure uid and guid will be same
 RUN groupadd -g 288 kdcproxy ; useradd -u 288 -g 288 -c 'IPA KDC Proxy User' -d '/var/lib/kdcproxy' -s '/sbin/nologin' kdcproxy
