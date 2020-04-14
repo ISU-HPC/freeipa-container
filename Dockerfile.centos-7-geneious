@@ -60,18 +60,20 @@ RUN systemctl enable postfix
 RUN groupadd -g 288 kdcproxy ; useradd -u 288 -g 288 -c 'IPA KDC Proxy User' -d '/var/lib/kdcproxy' -s '/sbin/nologin' kdcproxy
 RUN groupadd -g 289 ipaapi; useradd -u 289 -g 289 -c 'IPA Framework User' -r -d / -s '/sbin/nologin' ipaapi
 
-# geneious prereq additions
-RUN yum -y install redhat-lsb redhat-lsb.i686 redhat-lsb-graphics redhat-lsb-printing perl-Test-Exception policycoreutils-gui tmpwatch net-tools bind-utils yum-utils java-1.8.0  postgresql postgresql-server
-RUN yum -y groupinstall Base Desktop "General Purpose Desktop" "Graphical Administration Tools" "X Window System"
-
-RUN yum -q -y remove java-1.5.0-gcj-devel java-1.7.0 java-1.6.0
-#RUN yum -y install policycoreutils-gui tmpwatch net-tools bind-utils yum-utils perl-Test-Exception  java-1.8.0 postgresql postgresql-server lsb
-RUN systemctl enable postgresql.service
-# # end geneious prereq
 
 # Workaround 1615948
 RUN ln -s /bin/false /usr/sbin/systemd-machine-id-setup
-RUN yum upgrade -y && yum install -y ipa-server ipa-server-dns ipa-server-trust-ad patch && yum clean all
+#RUN yum upgrade -y && yum install -y ipa-server ipa-server-dns ipa-server-trust-ad patch && yum clean all
+RUN yum install -y ipa-server ipa-server-dns ipa-server-trust-ad patch
+
+# geneious prereq additions
+RUN yum -y install redhat-lsb redhat-lsb.i686 redhat-lsb-graphics redhat-lsb-printing perl-Test-Exception policycoreutils-gui tmpwatch net-tools bind-utils yum-utils java-1.8.0  postgresql postgresql-server
+
+RUN yum -q -y remove java-1.5.0-gcj-devel java-1.7.0 java-1.6.0
+RUN systemctl enable postgresql.service
+#RUN yum -y groupinstall Base Desktop "General Purpose Desktop" "Graphical Administration Tools" "X Window System"
+# # end geneious prereq
+
 
 # debug: RUN test $( getent passwd | grep -E "^(dirsrv:x:389|ipaapi:x:289|kdcproxy:x:288|pkiuser:x:17):" | wc -l ) -eq 4
 
@@ -134,6 +136,7 @@ ENTRYPOINT [ "/usr/local/sbin/init" ]
 # test: systemd-container-ipa-server-install-data.sh docker-diff-minimal-centos-7.out
 
 # Configure master/replica upon the first invocation
+COPY startup.sh /usr/local/bin/startup.sh
 COPY init-data-slurm-munge /usr/local/sbin/init
 ##COPY ipa-server-configure-first exit-with-status ipa-volume-upgrade-* /usr/sbin/
 ##COPY ipa-server-configure-first.service ipa-server-upgrade.service ipa-server-update-self-ip-address.service /usr/lib/systemd/system/
@@ -152,9 +155,6 @@ RUN uuidgen > /data-template/build-id
 COPY install.sh uninstall.sh /bin/
 COPY atomic-install-help /usr/share/ipa/
 
-# geneious prereq additions
-#RUN yum -y groupinstall Base Desktop "General Purpose Desktop" "Graphical Administration Tools" "X Window System" 
-# end geneious prereq
 
 # For atomic, we run INSTALL --privileged but install.sh will start another unprivileged container.
 # We do it this way to be able to set hostname for the unprivileged container.
