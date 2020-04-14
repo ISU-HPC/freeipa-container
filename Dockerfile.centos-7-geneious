@@ -71,7 +71,7 @@ RUN yum -y install redhat-lsb redhat-lsb.i686 redhat-lsb-graphics redhat-lsb-pri
 
 RUN yum -q -y remove java-1.5.0-gcj-devel java-1.7.0 java-1.6.0
 RUN systemctl enable postgresql.service
-#RUN yum -y groupinstall Base Desktop "General Purpose Desktop" "Graphical Administration Tools" "X Window System"
+RUN yum -y groupinstall Base Desktop "General Purpose Desktop" "Graphical Administration Tools" "X Window System"
 # # end geneious prereq
 
 
