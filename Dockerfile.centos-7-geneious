@@ -67,7 +67,7 @@ RUN ln -s /bin/false /usr/sbin/systemd-machine-id-setup
 RUN yum install -y ipa-server ipa-server-dns ipa-server-trust-ad patch
 
 # geneious prereq additions
-RUN yum -y install redhat-lsb redhat-lsb.i686 redhat-lsb-graphics redhat-lsb-printing perl-Test-Exception policycoreutils-gui tmpwatch net-tools bind-utils yum-utils java-1.8.0  postgresql postgresql-server
+RUN yum -y install redhat-lsb redhat-lsb.i686 redhat-lsb-graphics redhat-lsb-printing perl-Test-Exception policycoreutils-gui tmpwatch net-tools bind-utils yum-utils java-1.8.0  postgresql postgresql-server  tomcat  tomcat-jsp-2.2-api
 
 RUN yum -q -y remove java-1.5.0-gcj-devel java-1.7.0 java-1.6.0
 RUN systemctl enable postgresql.service
@@ -76,6 +76,16 @@ RUN yum -y groupinstall Base
 RUN yum -y groupinstall "General Purpose Desktop" 
 RUN yum -y groupinstall "Graphical Administration Tools"
 RUN yum -y groupinstall "X Window System"
+
+RUN systemctl enable tomcat
+WORKDIR /root
+RUN wget http://assets.geneious.com/geneious-server/geneiousserver-2020.0.5/Geneious_Server_2020_0_5.tar.gz
+RUN tar xvvfz Geneious_Server_2020_0_5.tar.gz
+WORKDIR /root/Geneious_Server_current
+RUN mv /usr/bin/host /usr/bin/host.orig
+COPY  host.replacement /usr/bin/host
+RUN ./bin/installprerequisites  -t 5 -p "qrLVC2dcA.ds+9K8eYA"
+RUN mv /usr/bin/host.orig /usr/bin/host
 # # end geneious prereq
 
 
@@ -184,7 +194,7 @@ LABEL uninstall 'docker run --rm --privileged -v /:/host -e HOST=/host -e DATADI
 LABEL summary="Identity Management (IdM) for Linux provides centralized \
 management of identities and policies for Atomic Host"
 LABEL description="IPA is an integrated solution to provide centrally managed \
-Identity (users, hosts, services), Authentication (SSO, 2FA), and \
+nIdentity (users, hosts, services), Authentication (SSO, 2FA), and \
 Authorization (host access control, SELinux user roles, services). The \
 solution provides features for further integration with Linux based clients \
 (SUDO, automount) and integration with Active Directory based infrastructures \
